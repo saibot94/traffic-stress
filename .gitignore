@@ -1,3 +1,9 @@
 *.pyc
 __pycache__
 *~
+AERO_HackTM/Debug
+AERO_HackTM/Release
+AERO_HackTM/app
+AERO_HackTM/.vs
+.idea
+java-json-producer/target
