@@ -2,29 +2,75 @@ package controllers
 
 import javax.inject._
 
+import akka.actor.Status
+import akka.actor.Status.Failure
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
-import com.hacktm.websockets.{DataUpdateActor, MasterActor, NotifyData, TrackWebsocket}
+import com.hacktm.dto.CarJsonDTO
+import com.hacktm.dto.CarJsonDTO._
+import com.hacktm.websockets.{DataUpdateActor, MasterActor, NotifyData}
+import play.api.Configuration
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.streams._
 import play.api.mvc._
+import play.modules.reactivemongo._
+import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.commands.WriteResult
+import reactivemongo.bson.BSONDocument
+import reactivemongo.play.json.collection.JSONCollection
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
+import scala.concurrent.Future
+import scala.util.Success
+
+
 @Singleton
-class ApiController @Inject()(implicit system: ActorSystem, materializer: Materializer) extends Controller {
+class ApiController @Inject()(implicit system: ActorSystem,
+                              materializer: Materializer,
+                              val reactiveMongoApi: ReactiveMongoApi,
+                              configuration: Configuration) extends Controller
+  with MongoController with ReactiveMongoComponents {
 
   val masterActor: ActorRef = system.actorOf(MasterActor.props)
+  val userId: Int = configuration.getInt("user.id").getOrElse(3)
 
   def index = Action { implicit request =>
-    masterActor ! NotifyData(3, Json.toJson(3))
     Ok(Json.toJson(Map("hello" -> "world")))
   }
+
+
+  def carDataCollection: Future[BSONCollection] = database.map {
+    db => db.collection[BSONCollection](configuration.getString("db.collection").getOrElse("cardata"))
+  }
+
 
   def socket(id: Int): WebSocket = WebSocket.accept[String, String] { request =>
     println(s"I've got a connection with id: $id")
     ActorFlow.actorRef(out => DataUpdateActor.props(masterActor, out, id))
   }
+
+  def receiveData: Action[JsValue] = Action.async(parse.json) {
+    implicit request =>
+      request.body.validate[CarJsonDTO].map {
+        data =>
+          carDataCollection.map {
+            col =>
+              val bsonWriter = BSONDocument(
+                "hello" -> "world"
+              )
+              masterActor ! NotifyData(userId, data)
+              val writeRes: Future[WriteResult] = col.insert(bsonWriter)
+
+              writeRes.onComplete { // Dummy callbacks
+                case Success(writeResult) =>
+                  println(s"successfully inserted document with result: $writeResult")
+              }
+              Ok("Inserted")
+          }
+      }.getOrElse(Future.successful {
+        BadRequest(Json.toJson(Map("error" -> "invalid json")))
+      })
+  }
+
 }
+

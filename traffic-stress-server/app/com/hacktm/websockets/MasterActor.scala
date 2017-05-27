@@ -1,6 +1,7 @@
 package com.hacktm.websockets
 
 import akka.actor.{Actor, ActorRef, Props}
+import com.hacktm.dto.CarJsonDTO
 import play.api.libs.json.JsValue
 
 import scala.collection.mutable
@@ -10,7 +11,7 @@ import scala.collection.mutable.ListBuffer
   * Created by darkg on 27-May-17.
   */
 
-case class NotifyData(id: Int, data: JsValue)
+case class NotifyData(id: Int, data: CarJsonDTO)
 case class TrackWebsocket(id: Int, actor: ActorRef)
 
 object MasterActor {

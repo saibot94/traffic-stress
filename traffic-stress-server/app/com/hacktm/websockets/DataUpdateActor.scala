@@ -19,8 +19,8 @@ class DataUpdateActor (manager: ActorRef, out: ActorRef, id: Int) extends Actor 
   def receive: PartialFunction[Any, Unit] = {
     case msg: String =>
       out ! ("I received the message " + msg)
-    case NotifyData(id, data) =>
-      out ! ("I received the message " + id)
+    case NotifyData(userId, data) =>
+      out ! (s"I received the id [$userId] and the message =>  " + data)
   }
 
   def close: Unit = {
