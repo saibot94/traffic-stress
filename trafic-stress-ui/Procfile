@@ -1,0 +1,1 @@
+web: java $JVM_OPTS -cp target/trafic-stress-ui.jar clojure.main -m trafic-stress-ui.server
