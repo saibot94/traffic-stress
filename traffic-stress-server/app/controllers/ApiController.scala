@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 
 import akka.actor.Status
+import play.api.mvc.WebSocket.{FrameFormatter, MessageFlowTransformer}
 import akka.actor.Status.Failure
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
@@ -31,6 +32,9 @@ class ApiController @Inject()(implicit system: ActorSystem,
                               configuration: Configuration) extends Controller
   with MongoController with ReactiveMongoComponents {
 
+  implicit val messageFlowTransformer: MessageFlowTransformer[String, JsValue]
+    = MessageFlowTransformer.jsonMessageFlowTransformer[String, JsValue]
+
   val masterActor: ActorRef = system.actorOf(MasterActor.props)
   val userId: Int = configuration.getInt("user.id").getOrElse(3)
 
@@ -44,7 +48,7 @@ class ApiController @Inject()(implicit system: ActorSystem,
   }
 
 
-  def socket(id: Int): WebSocket = WebSocket.accept[String, String] { request =>
+  def socket(id: Int): WebSocket = WebSocket.accept[String, JsValue] { request =>
     println(s"I've got a connection with id: $id")
     ActorFlow.actorRef(out => DataUpdateActor.props(masterActor, out, id))
   }
@@ -63,7 +67,7 @@ class ApiController @Inject()(implicit system: ActorSystem,
                 case Success(writeResult) =>
                   println(s"successfully inserted document with result")
               }
-              Ok("Inserted")
+              Ok(Json.toJson(Map("status" -> "ok")))
           }
       }.getOrElse(Future.successful {
         BadRequest(Json.toJson(Map("error" -> "invalid json")))

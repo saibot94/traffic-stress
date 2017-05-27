@@ -3,6 +3,7 @@ package com.hacktm.websockets
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
+import play.api.libs.json.Json
 
 /**
   * Created by darkg on 27-May-17.
@@ -20,7 +21,7 @@ class DataUpdateActor (manager: ActorRef, out: ActorRef, id: Int) extends Actor 
     case msg: String =>
       out ! ("I received the message " + msg)
     case NotifyData(userId, data) =>
-      out ! (s"I received the id [$userId] and the message =>  " + data)
+      out ! Json.toJson(data)
   }
 
   def close: Unit = {
