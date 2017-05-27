@@ -1,27 +1,27 @@
 /*! \file ****************************************************************************************************************************
 
-  COMPANY:           Continental Automotive: Advanced Driver Assistance Systems - Advanced Engineering (for HackTM participants)
+COMPANY:           Continental Automotive: Advanced Driver Assistance Systems - Advanced Engineering (for HackTM participants)
 
-  PROJECT:           ...
+PROJECT:           ...
 
-  MODULNAME:         aero_hacktm_task.cpp
+MODULNAME:         aero_hacktm_task.cpp
 
-  DESCRIPTION:       HackTM module reading inputs from from Stereo Camera, Long Range Radar (both front center), Vehicle Dynamics
-					 and GPS data.
+DESCRIPTION:       HackTM module reading inputs from from Stereo Camera, Long Range Radar (both front center), Vehicle Dynamics
+and GPS data.
 
-  CREATION DATE:     28.03.2016
+CREATION DATE:     28.03.2016
 
-  VERSION:           $Revision: 1.1 $
+VERSION:           $Revision: 1.1 $
 
-  -------------------------------------------------
-  About ADAS Advanced Engineering:
-  -------------------------------------------------
-	http://tinyurl.com/ContiAdasAeInterview
-	http://tinyurl.com/ContiAutomatedDriving
+-------------------------------------------------
+About ADAS Advanced Engineering:
+-------------------------------------------------
+http://tinyurl.com/ContiAdasAeInterview
+http://tinyurl.com/ContiAutomatedDriving
 
-	And some projects we're working on in Timisoara:
-	http://continental-automated-driving.com/Navigation/Enablers/Comprehensive-Environment-Model
-	http://continental-automated-driving.com/Navigation/Driving-Functions/Cruising-Chauffeur
+And some projects we're working on in Timisoara:
+http://continental-automated-driving.com/Navigation/Enablers/Comprehensive-Environment-Model
+http://continental-automated-driving.com/Navigation/Driving-Functions/Cruising-Chauffeur
 
 
 */
@@ -77,11 +77,11 @@ std::string recordingId = "";
 //////////////////////////////////////////////////////////
 
 /**
-   * @brief  Default constructor.
-	*
-	 * @param inst_name  Name of the plugin instance.
-	  * @param callback   Pointer to the central callback hook (for internal use).
-	  **/
+* @brief  Default constructor.
+*
+* @param inst_name  Name of the plugin instance.
+* @param callback   Pointer to the central callback hook (for internal use).
+**/
 CModPlugIn::CModPlugIn(const char* inst_name, wxPlg_IntFunT callback)
 	: CEvtPlugIn(inst_name, callback)
 {
@@ -103,8 +103,8 @@ CModPlugIn::CModPlugIn(const char* inst_name, wxPlg_IntFunT callback)
 
 
 /**
-   * @brief Destructor.
-   **/
+* @brief Destructor.
+**/
 CModPlugIn::~CModPlugIn()
 {
 	eCAL::Finalize();
@@ -154,7 +154,6 @@ void setup_hacktm_dump_file()
 		else
 		{
 			LOG_INFO("Filedump open");
-			outFile << "[";
 		}
 	}
 	catch (const std::exception&)
@@ -171,7 +170,6 @@ void close_hacktm_dump_file()
 	}
 	else
 	{
-		outFile << "]";
 		outFile.close();
 	}
 }
@@ -312,17 +310,8 @@ long CModPlugIn::wxEVT_STEP(const wxPlg_Obj* arg_obj, wxPlg_Obj* ret_obj)
 
 	if (LRR_FC_TrafParticList.u_NumTrafficParticipants > 0)
 	{
-		LOG_INFO("LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_X: %f", LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_X);
-		char bufferLong[150];
-		sprintf(bufferLong, "%f", LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_X);
-		std::string longitude(bufferLong);
-		dataJson += "\"trafficx\":" + longitude + ",";
-
-		LOG_INFO("LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_Y: %f", LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_Y);
-		char bufferLat[150];
-		sprintf(bufferLat, "%f", LRR_FC_TrafParticList.TrafPart[0].DynProp.Velocity.f_Y);
-		std::string latitude(bufferLat);
-		dataJson += "\"trafficy\":" + latitude + ",";
+		dataJson += "\"trafficx\":" + getRadarXTrafficStr() + ",";
+		dataJson += "\"trafficy\":" + getRadarYTrafficStr() + ",";
 	}
 	else
 	{
@@ -332,33 +321,12 @@ long CModPlugIn::wxEVT_STEP(const wxPlg_Obj* arg_obj, wxPlg_Obj* ret_obj)
 
 	if (SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0)
 	{
-		std::string latitudeStr = "[";
-
-		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
-			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
-			char bufferLong[150];
-			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
-			latitudeStr += std::string(bufferLong);
-			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
-				latitudeStr += ",";
-			}
-		}
-		latitudeStr += "]";
-
-		std::string heightStr = "[";
-		dataJson += "\"trafficlength\":" + latitudeStr + ",";
-		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants; i++) {
-			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Height: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
-			char bufferLong[150];
-			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
-			heightStr += std::string(bufferLong);
-			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
-				heightStr += ",";
-			}
-		}
-		heightStr += "]";
-		dataJson += "\"trafficheight\":" + heightStr + ",";
-
+		dataJson += "\"trafficxcam\":" + getCameraXTrafficStr() + ",";
+		dataJson += "\"trafficycam\":" + getCameraYTrafficStr() + ",";
+		dataJson += "\"trafficheadingcam\":" + getCameraTrafficHeading() + ",";
+		dataJson += "\"trafficlengthcam\":" + getCameraTrafficLength() + ",";
+		dataJson += "\"trafficspeedxcam\":" + getCameraXVelocity() + ",";
+		dataJson += "\"trafficspeedycam\":" + getCameraYVelocity() + ",";
 	}
 	else
 	{
@@ -434,6 +402,174 @@ long CModPlugIn::wxEVT_STEP(const wxPlg_Obj* arg_obj, wxPlg_Obj* ret_obj)
 	return true;
 };
 
+/* =========== User defined data getting functions  ================ */
+
+std::string CModPlugIn::getCameraXVelocity() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficHeading = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_X);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_X);
+			trafficHeading += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficHeading += ",";
+			} 
+		} 
+		trafficHeading += "]";
+		return trafficHeading;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getCameraYVelocity() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficHeading = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_Y);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_Y);
+			trafficHeading += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficHeading += ",";
+			} 
+		} 
+		trafficHeading += "]";
+		return trafficHeading;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getCameraXTrafficStr() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficHeading = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Position.f_X);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Position.f_X);
+			trafficHeading += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficHeading += ",";
+			} 
+		} 
+		trafficHeading += "]";
+		return trafficHeading;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getCameraYTrafficStr() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficHeading = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Position.f_Y);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Position.f_Y);
+			trafficHeading += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficHeading += ",";
+			} 
+		} 
+		trafficHeading += "]";
+		return trafficHeading;
+	}else {
+		return "[]";
+	}
+}
+
+
+std::string CModPlugIn::getCameraTrafficHeading() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficHeading = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Heading.f_Value);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", RAD2DEG(SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Heading.f_Value));
+			trafficHeading += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficHeading += ",";
+			}
+		}
+		trafficHeading += "]";
+		return trafficHeading;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getCameraTrafficLength() {
+	if(SCAM_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string trafficLength = "[";
+		for (int i = 0; i < SCAM_FC_TrafParticList.u_NumTrafficParticipants ; i++) {
+			LOG_INFO("SCAM_FC_TrafParticList.TrafPart[%d].GeomProp.Length: %.1f", i, SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", SCAM_FC_TrafParticList.TrafPart[i].GeomProp.Length.f_Value);
+			trafficLength += std::string(bufferLong);
+			if (i != (SCAM_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				trafficLength += ",";
+			}
+		}
+		trafficLength += "]";
+		return trafficLength;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getRadarXTrafficStr() {		
+	if (LRR_FC_TrafParticList.u_NumTrafficParticipants > 0)
+	{
+		std::string jsonVal = "[";
+		for (int i = 0; i < LRR_FC_TrafParticList.u_NumTrafficParticipants; i++) {
+			LOG_INFO("LRR_FC_TrafParticList.TrafPart[%d].DynProp.Velocity.f_X: %f",i, LRR_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_X);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", LRR_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_X);
+			jsonVal += std::string(bufferLong);
+			if (i != (LRR_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				jsonVal += ",";
+			}
+		}
+		jsonVal += "]";
+		return jsonVal;
+	} else {
+		return "[]";
+	}
+
+}
+
+
+std::string CModPlugIn::getRadarYTrafficStr() {
+	if(LRR_FC_TrafParticList.u_NumTrafficParticipants > 0) {
+		std::string jsonVal = "[";
+		for (int i = 0; i < LRR_FC_TrafParticList.u_NumTrafficParticipants; i++) {
+			LOG_INFO("LRR_FC_TrafParticList.TrafPart[%d].DynProp.Velocity.f_Y: %f", i, LRR_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_Y);
+			char bufferLong[150];
+			sprintf(bufferLong, "%.1f", LRR_FC_TrafParticList.TrafPart[i].DynProp.Velocity.f_Y);
+			jsonVal += std::string(bufferLong);
+			if (i != (LRR_FC_TrafParticList.u_NumTrafficParticipants - 1)) {
+				jsonVal += ",";
+			}
+		}
+		jsonVal += "]";
+		return jsonVal;
+	} else {
+		return "[]";
+	}
+
+}
 
 //! Event DRAW2D will be called every n-th ms depending from host application settings
 long CModPlugIn::wxEVT_DRAW2D(const wxPlg_Obj* arg_obj, wxPlg_Obj* ret_obj)

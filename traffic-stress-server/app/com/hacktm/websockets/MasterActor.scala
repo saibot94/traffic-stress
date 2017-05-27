@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
   * Created by darkg on 27-May-17.
   */
 
-case class NotifyData(id: Int, data: CarJsonDTO)
+case class NotifyData(id: Int, data: List[CarJsonDTO])
 case class TrackWebsocket(id: Int, actor: ActorRef)
 
 object MasterActor {
@@ -23,14 +23,13 @@ class MasterActor extends Actor {
 
   override def receive: Receive = {
     case NotifyData(id, data) =>
-      println(s"got id and data: $id, $data")
       registeredActors.get(id) match {
         case None =>
           println("WARN: Could not find any socket to send data to")
         case Some(lb) =>
           lb.foreach {
             actor =>
-              actor ! NotifyData(id, data)
+              actor ! NotifyData(id, data.take(10))
           }
       }
 

@@ -16,7 +16,7 @@ import play.api.libs.streams._
 import play.api.mvc._
 import play.modules.reactivemongo._
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
+import reactivemongo.api.commands.{MultiBulkWriteResult, WriteResult}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.collection.JSONCollection
 
@@ -51,19 +51,17 @@ class ApiController @Inject()(implicit system: ActorSystem,
 
   def receiveData: Action[JsValue] = Action.async(parse.json) {
     implicit request =>
-      request.body.validate[CarJsonDTO].map {
+      request.body.validate[List[CarJsonDTO]].map {
         data =>
           carDataCollection.map {
             col =>
-              val bsonWriter = BSONDocument(
-                "hello" -> "world"
-              )
               masterActor ! NotifyData(userId, data)
-              val writeRes: Future[WriteResult] = col.insert(bsonWriter)
+              val bulkDocs = data.map(implicitly[col.ImplicitlyDocumentProducer](_))
+              val writeRes: Future[MultiBulkWriteResult] = col.bulkInsert(ordered=false)(bulkDocs :_*)
 
               writeRes.onComplete { // Dummy callbacks
                 case Success(writeResult) =>
-                  println(s"successfully inserted document with result: $writeResult")
+                  println(s"successfully inserted document with result")
               }
               Ok("Inserted")
           }

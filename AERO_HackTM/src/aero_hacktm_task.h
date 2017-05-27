@@ -105,6 +105,18 @@ namespace Tasks
 	    void AEROTP_DataReceive_VEH_DYN(const char* topic_name_, const class aero_vehicle_data_protobuf::AERO_t_VehicleDynamics_Proto& msg_, const long long time_);
 	    void AEROTP_DataReceive_GPS(const char* topic_name_, const class aero_gps_rmc_protobuf::AERO_t_GpsRmc_Proto& msg_, const long long time_);
 
+		// user defined functions
+		// radar data
+		std::string getRadarXTrafficStr();
+		std::string getRadarYTrafficStr();
+
+		// camera data
+		std::string getCameraXTrafficStr();
+		std::string getCameraYTrafficStr();
+		std::string getCameraTrafficLength();
+		std::string getCameraTrafficHeading();	
+		std::string getCameraYVelocity();
+		std::string getCameraXVelocity();
 
 		eCAL::CProtoSubscriber<class aero_trafpartic_protobuf::AERO_t_TrafParticList_Proto> *mSubTP_LRR_FC;
         eCAL::CProtoSubscriber<class aero_trafpartic_protobuf::AERO_t_TrafParticList_Proto> *mSubTP_SCAM_FC;
