@@ -14,3 +14,9 @@
 
 
 (re-frame/reg-sub :socket-messages #(:socket-messages %))
+(re-frame/reg-sub :menu-state #(:menu-state %))
+(re-frame/reg-sub :curses #(:curses %))
+(re-frame/reg-sub :colors #(:colors %))
+(re-frame/reg-sub :stress-value #(:stress-value %))
+
+(re-frame/reg-sub :stats #(:stats %))

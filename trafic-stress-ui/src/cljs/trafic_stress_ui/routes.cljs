@@ -20,6 +20,8 @@
   ;; define routes here
   (defroute "/" []
     (re-frame/dispatch [:set-active-panel :home-panel]))
+  (defroute "/stats" []
+    (re-frame/dispatch [:set-active-panel :stats-panel]))
 
 
   ;; --------------------

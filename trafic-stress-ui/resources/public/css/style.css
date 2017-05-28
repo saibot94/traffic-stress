@@ -1,0 +1,169 @@
+.header {
+  position : fixed;
+  z-index: 2;
+  top : 0;
+  right: 0;
+  left : 0;
+  height : 50px;
+  margin: 0;
+  padding : 0;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.10),0 1px 5px 0 rgba(0,0,0,0.05);
+  background-color: #00bcd4;
+  background-image: url("/img/logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+  float: left;
+  z-index: 10;
+}
+
+.hamburger {
+  background-image: url("/img/hamburger.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 50px 50px;
+}
+
+.content {
+  margin-top: 50px;
+  z-index: 1;
+}
+
+
+
+.curses-list {
+  
+}
+
+
+.curse-item {
+  background-color: #f2f2f2;
+  font-size: 25px;
+  text-align: center;
+  min-height: 150px;
+  margin-top: 10px;
+  position: relative;
+}
+
+.curse-item > span {
+    position: absolute;
+  top : 0;
+  bottom : 0;
+  left : 0;
+  right: 0;
+  display: inline-block;
+}
+
+.curse-item p {
+  padding: 0 auto;
+}
+
+
+.modal{
+  position: fixed;
+  top : 0;
+  bottom : 0;
+  left : 0;
+  right: 0;
+  background: black;
+  opacity: 0.3;
+  z-index: 100;
+}
+
+.menu {
+  position: fixed;
+  top : 0;
+  bottom : 0;
+  background: #f2f2f2;
+  width: 66%;
+  max-width: 300px;
+  z-index: 101;
+}
+
+.nav-menu {
+  margin-top : 152px;
+  padding: 0;
+}
+
+.nav-menu li {
+  list-style: none;
+  font-size: 18px;
+  padding-left: 30px;
+  padding : 10px;
+  cursor: pointer;
+}
+
+
+.menu-art {
+  background-image: url("/img/imagine.png");
+  height: 150px;
+  width: 100%;
+  position: absolute;
+}
+
+
+.background {
+  z-index: -1;
+  position: fixed;
+  top : 0;
+  bottom : 0;
+  left : 0;
+  right : 0;
+  background-image: url("/img/splash.png");
+  background-repeat : no-repeat;
+  background-size: 200px;
+  background-position: center;
+}
+
+.stress-0 {
+  background-color : #b2ebf2;
+  transition: background-color 2s ease-out;
+}
+
+.menu-item-0{
+  border-bottom: solid 1px #b2ebf2;
+  color : black;
+}
+.active-0{
+  background-color : #b2ebf2;
+  color : black;
+}
+
+
+.stress-1 {
+  background-color : #4dd0e1;
+  transition: background-color 2s ease-out;
+}
+
+.menu-item-1 {
+  border-bottom: solid 1px #4dd0e1;
+}
+
+.active-1 {
+  background-color : #4dd0e1;
+  color : #f2f2f2;
+}
+
+
+.stress-2 {
+  background-color : #008ba3;
+  transition: background-color 2s ease-out;
+}
+
+.menu-item-2 {
+  border-bottom: solid 1px #008ba3;
+}
+
+.active-2 {
+  background-color : #008ba3;
+  color : #f2f2f2;
+}
+
+.stats-panel {
+  margin-top: 10px;
+  background: #f2f2f2
+}

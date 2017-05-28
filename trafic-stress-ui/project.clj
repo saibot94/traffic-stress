@@ -4,10 +4,14 @@
                  [http-kit "2.1.18"]
                  [reagent "0.6.0"]
                  [re-frame "0.9.2"]
+                 [cljsjs/highcharts "5.0.4-0"]
+                 [cljs-ajax "0.6.0"]
+                 [day8.re-frame/http-fx "0.1.3"]
                  [secretary "1.2.3"]
                  [compojure "1.5.0"]
                  [yogthos/config "0.8"]
-                 [ring "1.4.0"]]
+                 [ring "1.4.0"]
+                 [puppetlabs/ring-middleware "1.0.0"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]]
 
@@ -24,7 +28,9 @@
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.8.2"]]
+   {:dependencies [[binaryage/devtools "0.8.2"]
+                   [com.cemerick/piggieback "0.2.1"]
+                   [proto-repl "0.3.1"]]
 
     :plugins      [[lein-figwheel "0.5.9"]]}}
 
